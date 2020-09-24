@@ -1003,13 +1003,13 @@ class SqliteFlatDb(SqliteDb):
 
         self.CHECK_TABLES = ("SELECT name FROM sqlite_master WHERE type='table'"
                              " AND name='%sObjects';" % tablePrefix)
-        self.SELECT = "SELECT * FROM %sObjects WHERE " % tablePrefix
-        self.FROM = "FROM %sObjects" % tablePrefix
-        self.DELETE = "DELETE FROM %sObjects WHERE " % tablePrefix
-        self.INSERT_CLASS = ("INSERT INTO %sClasses (label_property, "
+        self.SELECT = "SELECT * FROM [%sObjects] WHERE " % tablePrefix
+        self.FROM = "FROM [%sObjects]" % tablePrefix
+        self.DELETE = "DELETE FROM [%sObjects] WHERE " % tablePrefix
+        self.INSERT_CLASS = ("INSERT INTO [%sClasses] (label_property, "
                              "column_name, class_name) VALUES (?, ?, ?)"
                              % tablePrefix)
-        self.SELECT_CLASS = "SELECT * FROM %sClasses;" % tablePrefix
+        self.SELECT_CLASS = "SELECT * FROM [%sClasses];" % tablePrefix
         self.EXISTS = "SELECT EXISTS(SELECT 1 FROM Objects WHERE %s=? LIMIT 1)"
         self.tablePrefix = tablePrefix
         self._createConnection(dbName, timeout)
@@ -1106,13 +1106,13 @@ class SqliteFlatDb(SqliteDb):
                       value     TEXT  DEFAULT NULL -- property value
                       )""")
         # Create the Classes table to store each column name and type
-        self.executeCommand("""CREATE TABLE IF NOT EXISTS %sClasses
+        self.executeCommand("""CREATE TABLE IF NOT EXISTS [%sClasses]
                      (id        INTEGER PRIMARY KEY AUTOINCREMENT,
                       label_property      TEXT UNIQUE, --object label                 
                       column_name TEXT UNIQUE,
                       class_name TEXT DEFAULT NULL  -- relation's class name
                       )""" % self.tablePrefix)
-        CREATE_OBJECT_TABLE = """CREATE TABLE IF NOT EXISTS %sObjects
+        CREATE_OBJECT_TABLE = """CREATE TABLE IF NOT EXISTS [%sObjects]
                      (id        INTEGER PRIMARY KEY,
                       enabled   INTEGER DEFAULT 1,   -- used to selected/deselect items from a set
                       label     TEXT DEFAULT NULL,   -- object label, text used for display
@@ -1147,8 +1147,8 @@ class SqliteFlatDb(SqliteDb):
 
     def setupCommands(self, objDict):
         """ Setup the INSERT and UPDATE commands base on the object dictionary. """
-        self.INSERT_OBJECT = "INSERT INTO %sObjects (id, enabled, label, comment, creation" % self.tablePrefix
-        self.UPDATE_OBJECT = "UPDATE %sObjects SET enabled=?, label=?, comment=?" % self.tablePrefix
+        self.INSERT_OBJECT = "INSERT INTO [%sObjects] (id, enabled, label, comment, creation" % self.tablePrefix
+        self.UPDATE_OBJECT = "UPDATE [%sObjects] SET enabled=?, label=?, comment=?" % self.tablePrefix
         c = 0
         for k in objDict:
             colName = 'c%02d' % c
